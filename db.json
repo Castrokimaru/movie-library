@@ -1,0 +1,29 @@
+{
+  "movies": [
+    {
+      "id": 1,
+      "name": "Inception",
+      "image": "https://m.media-amazon.com/images/I/51s+KmGv2xL._AC_SY679_.jpg"
+    },
+    {
+      "id": 2,
+      "name": "Interstellar",
+      "image": "https://m.media-amazon.com/images/I/71n58YBbJpL._AC_SY679_.jpg"
+    },
+    {
+      "id": 3,
+      "name": "The Matrix",
+      "image": "https://m.media-amazon.com/images/I/51EG732BV3L.jpg"
+    },
+    {
+      "id": 4,
+      "name": "The Dark Knight",
+      "image": "https://m.media-amazon.com/images/I/71pC69I3lzL._AC_SY679_.jpg"
+    },
+    {
+      "id": 5,
+      "name": "Avengers: Endgame",
+      "image": "https://m.media-amazon.com/images/I/81ExhpBEbHL._AC_SY679_.jpg"
+    }
+  ]
+}

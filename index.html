@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title> Movie Library</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background: #aebdd0;
+      color: #443850;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+    #movie-list, #watchlist {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .movie-card {
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .movie-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+    button {
+      margin-top: 10px;
+      background: #4B6992;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .dark-mode {
+      background: #00070E;
+      color: #95A7C0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Movie Library</h1>
+    <button id="toggle-theme"> Dark Mode</button>
+    <input type="text" id="search" placeholder="Search for a movie..." />
+    <div id="movie-list"></div>
+
+    <h2>Library</h2>
+    <div id="watchlist"></div>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('search');
+    const movieList = document.getElementById('movie-list');
+    const watchlistEl = document.getElementById('watchlist');
+    const toggleThemeBtn = document.getElementById('toggle-theme');
+
+    let watchlist = JSON.parse(localStorage.getItem('watchlist')) || [];
+
+    document.body.classList.toggle('dark-mode', localStorage.getItem('theme') === 'dark');
+
+    toggleThemeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+      localStorage.setItem('theme', theme);
+    });
+
+    searchInput.addEventListener('input', async () => {
+      const query = searchInput.value;
+      if (query.length < 3) return;
+
+      const res = await fetch(`https://api.tvmaze.com/search/shows?q=${query}`);
+      const data = await res.json();
+
+      movieList.innerHTML = '';
+      data.forEach(item => {
+        const movie = item.show;
+        const card = document.createElement('div');
+        card.className = 'movie-card';
+        card.innerHTML = `
+          <img src="${movie.image ? movie.image.medium : 'https://via.placeholder.com/150'}" />
+          <h4>${movie.name}</h4>
+          <button onclick='addToWatchlist(${JSON.stringify({ id: movie.id, name: movie.name, image: movie.image?.medium })})'>+ Add</button>
+        `;
+        movieList.appendChild(card);
+      });
+    });
+
+    function addToWatchlist(movie) {
+      if (!watchlist.find(m => m.id === movie.id)) {
+        watchlist.push(movie);
+        localStorage.setItem('watchlist', JSON.stringify(watchlist));
+        displayWatchlist();
+      }
+    }
+
+    function removeFromWatchlist(id) {
+      watchlist = watchlist.filter(movie => movie.id !== id);
+      localStorage.setItem('watchlist', JSON.stringify(watchlist));
+      displayWatchlist();
+    }
+
+    function displayWatchlist() {
+      watchlistEl.innerHTML = '';
+      watchlist.forEach(movie => {
+        const card = document.createElement('div');
+        card.className = 'movie-card';
+        card.innerHTML = `
+          <img src="${movie.image || 'https://via.placeholder.com/150'}" />
+          <h4>${movie.name}</h4>
+          <button onclick="removeFromWatchlist(${movie.id})">Remove</button>
+        `;
+        watchlistEl.appendChild(card);
+      });
+    }
+
+    displayWatchlist();
+  </script>
+</body>
+</html>
